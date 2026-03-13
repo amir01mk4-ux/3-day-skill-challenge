@@ -1,18 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3-Day Skill Challenge</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Day Skill Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Premium Dark Mode Styling */
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Deep slate gray */
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            background-color: #1e293b;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid #334155;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            /* Gradient Text Effect */
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background-color: #0f172a;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        select:focus {
+            border-color: #60a5fa;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        button:disabled {
+            background: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* The hidden box where the AI response will show up */
+        #result-box {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #0f172a;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .shots-counter {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>3-Day Skill Challenge</h1>
-    <p id="category">Category: Knowledge</p>
-    <button id="newSkillBtn">Give Me a Skill</button>
-    <div id="skillContainer"></div>
-  </div>
-  <script src="script.js"></script>
+
+    <div class="app-container">
+        <h1>3-Day Skill Challenge</h1>
+        <p class="subtitle">Discover a random micro-skill and master it in just 15 minutes a day.</p>
+
+        <div class="input-group">
+            <label for="category">Select a Category</label>
+            <select id="category">
+                <option value="knowledge">General Knowledge</option>
+                <option value="tech">Technology & Code</option>
+                <option value="business">Business & Psychology</option>
+                <option value="survival">Survival & Life Hacks</option>
+            </select>
+        </div>
+
+        <button id="action-btn" onclick="generateSkill()">Give Me a Skill</button>
+        
+        <div class="shots-counter" id="shots-display">Daily Shots Left: 2</div>
+
+        <div id="result-box">
+            </div>
+    </div>
+
+    <script>
+        // 1. Set up the 2-Shot Limit Logic using the browser's local memory
+        let shotsLeft = localStorage.getItem('dailyShots');
+        let lastDate = localStorage.getItem('lastPlayDate');
+        let today = new Date().toLocaleDateString();
+
+        // Reset shots if it's a new day
+        if (lastDate !== today) {
+            shotsLeft = 2;
+            localStorage.setItem('dailyShots', shotsLeft);
+            localStorage.setItem('lastPlayDate', today);
+        }
+
+        // Update the UI immediately
+        updateUI();
+
+        async function generateSkill() {
+            if (shotsLeft > 0) {
+                const button = document.getElementById('action-btn');
+                const resultBox = document.getElementById('result-box');
+                const category = document.getElementById('category').value;
+                
+                // Show loading state
+                button.innerText = "Consulting AI...";
+                button.disabled = true;
+
+                // --- THE AI MAGIC HAPPENS HERE ---
+                try {
+                    // This is where we will call the Google Gemini API.
+                    // For right now, I am putting a placeholder response so you can test the UI.
+                    
+                    // Simulate a 1.5 second delay to feel like AI is thinking
+                    await new Promise(resolve => setTimeout(resolve, 1500)); 
+                    
+                    const aiResponse = `Here is your random ${category} skill: <strong>The Feynman Technique</strong>. <br><br>Learn to explain complex concepts simply. Are you ready to commit to the 3-day course?`;
+                    
+                    // Deduct a shot
+                    shotsLeft--;
+                    localStorage.setItem('dailyShots', shotsLeft);
+                    
+                    // Show the result
+                    resultBox.style.display = "block";
+                    resultBox.innerHTML = aiResponse;
+                    
+                    // Change button to the "Continue to Course" step if they are out of shots
+                    if (shotsLeft === 0) {
+                        button.innerText = "Start 3-Day Course";
+                        button.onclick = startCourse; // Changes what the button does
+                    } else {
+                        button.innerText = "Give Me Another Skill";
+                    }
+
+                } catch (error) {
+                    resultBox.style.display = "block";
+                    resultBox.innerHTML = "Oops! The AI is taking a nap. Try again.";
+                    button.innerText = "Give Me a Skill";
+                }
+
+                button.disabled = false;
+                updateUI();
+            }
+        }
+
+        function startCourse() {
+            const resultBox = document.getElementById('result-box');
+            resultBox.innerHTML = "Generating your custom 3-day syllabus... (Course logic coming soon!)";
+            document.getElementById('action-btn').disabled = true;
+        }
+
+        function updateUI() {
+            document.getElementById('shots-display').innerText = `Daily Shots Left: ${shotsLeft}`;
+            if (shotsLeft <= 0) {
+                 document.getElementById('action-btn').innerText = "Start 3-Day Course";
+                 document.getElementById('action-btn').onclick = startCourse;
+            }
+        }
+    </script>
 </body>
 </html>
